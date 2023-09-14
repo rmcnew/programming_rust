@@ -1,10 +1,10 @@
 use actix_web::{web, App, HttpResponse, HttpServer};
 use serde::Deserialize;
 
-const HTML : &str = "text/html";
+const HTML: &str = "text/html";
 
 fn gcd(mut n: u64, mut m: u64) -> u64 {
-    assert!(n != 0 && m!= 0);
+    assert!(n != 0 && m != 0);
     while m != 0 {
         if m < n {
             let t = m;
@@ -19,8 +19,7 @@ fn gcd(mut n: u64, mut m: u64) -> u64 {
 #[test]
 fn test_gcd() {
     assert_eq!(gcd(14, 15,), 1);
-    assert_eq!(gcd(2 * 3 * 5 * 11 * 17,
-                   3 * 7 * 11 * 13 * 19), 3 * 11);
+    assert_eq!(gcd(2 * 3 * 5 * 11 * 17, 3 * 7 * 11 * 13 * 19), 3 * 11);
 }
 
 #[derive(Deserialize)]
@@ -30,10 +29,8 @@ struct GcdParameters {
 }
 
 async fn get_index() -> HttpResponse {
-    HttpResponse::Ok()
-        .content_type(HTML)
-        .body(
-            r#"
+    HttpResponse::Ok().content_type(HTML).body(
+        r#"
                 <title>GCD Calculator</title>
                 <form action="/gcd" method="post">
                     <input type="text" name="n"/>
@@ -41,22 +38,24 @@ async fn get_index() -> HttpResponse {
                     <button type="submit">Compute GCD</button>
                 </form>
             "#,
-        )
+    )
 }
-
 
 async fn post_gcd(form: web::Form<GcdParameters>) -> HttpResponse {
     if form.n == 0 || form.m == 0 {
         return HttpResponse::BadRequest()
             .content_type(HTML)
-            .body("Computing the GCD with zero is boring.")
+            .body("Computing the GCD with zero is boring.");
     }
 
-    let response = format!("The greatest common divisor of the numbers {} and {} is <b>{}</b>\n", form.n, form.m, gcd(form.n, form.m));
+    let response = format!(
+        "The greatest common divisor of the numbers {} and {} is <b>{}</b>\n",
+        form.n,
+        form.m,
+        gcd(form.n, form.m)
+    );
 
-    HttpResponse::Ok()
-        .content_type(HTML)
-        .body(response)
+    HttpResponse::Ok().content_type(HTML).body(response)
 }
 
 #[actix_web::main]
@@ -68,6 +67,9 @@ async fn main() -> Result<(), std::io::Error> {
     });
 
     println!("Serving on http://localhost:3000 . . .");
-    server.bind(("127.0.0.1", 3000)).expect("error binding server to address")
-          .run().await
+    server
+        .bind(("127.0.0.1", 3000))
+        .expect("error binding server to address")
+        .run()
+        .await
 }
